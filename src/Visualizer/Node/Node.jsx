@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
+
 import './Node.css';
 
-export default class Visualizer extends Component {
+export default class Node extends Component {
+    static TileType = Object.freeze({"Normal":1, "Wall":2, "Start":3, "Finish":4})
+
     constructor() {
       super();
       this.state = { };
@@ -10,30 +13,26 @@ export default class Visualizer extends Component {
     render() {
         const {
             col,
-            isFinish,
-            isStart,
-            isWall,
-            onMouseDown,
-            onMouseEnter,
-            onMouseUp,
             row,
+            Type,
+            onMouseDown,
+            onMouseEnter
         } = this.props;
 
-        const extraClassName = isFinish
+        let extraClassName = (Node.TileType.Finish === Type)
             ? 'node-finish'
-            : isStart
+            : (Node.TileType.Start === Type)
             ? 'node-start'
-            : isWall
+            : (Node.TileType.Wall === Type)
             ? 'node-wall'
             : '';
-    
+
         return (
             <div
             id={`node-${row}-${col}`}
             className={`node ${extraClassName}`}      
             onMouseDown={() => onMouseDown(row, col)}
-            onMouseEnter={() => onMouseEnter(row, col)}
-            onMouseUp={() => onMouseUp()}></div>
+            onMouseEnter={() => onMouseEnter(row, col)}></div>
         );
     }
 }
