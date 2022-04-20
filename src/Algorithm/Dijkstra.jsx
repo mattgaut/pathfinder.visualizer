@@ -1,14 +1,11 @@
 import Node from '../Visualizer/Node/Node';
 import Heap from 'heap';
 
-export function astar(grid, startNode, finishNode) {
+export function dijkstra(grid, startNode, finishNode) {
     const visitedNodesInOrder = [];
     startNode.distance = 0;
     var openHeap = new Heap(function(nodeA, nodeB) {
-        const difference = (nodeA.distance + nodeA.distanceFromGoal) - (nodeB.distance + nodeB.distanceFromGoal);
-        if (difference === 0){
-          return nodeA.distanceFromGoal - nodeB.distanceFromGoal;
-        }
+        const difference = nodeA.distance - nodeB.distance;
         return difference;
     });
     var openSet = new Set();
@@ -27,7 +24,7 @@ export function astar(grid, startNode, finishNode) {
 
       visitedNodesInOrder.push({"node": closestNode, "isVisit": true});
 
-      getNeighbors(closestNode, grid).forEach(neighbor => assessNeighbor(neighbor, closestNode, openSet, openHeap, visitedNodesInOrder));
+      getNeighbors(closestNode, grid).forEach(neighbor => addNeighbor(neighbor, closestNode, openSet, openHeap, visitedNodesInOrder));
     }
 
     return {
@@ -36,29 +33,29 @@ export function astar(grid, startNode, finishNode) {
     };
   }
 
-  function assessNeighbor(neighbor, closestNode, openSet, openHeap, visitedNodesInOrder){
+  function addNeighbor(neighbor, closestNode, openSet, openHeap, visitedNodesInOrder){
     if (neighbor.Type === Node.TileType.Wall){
-      return;
+        return;
     }
 
     let weight = 1;
     if (neighbor.Type === Node.TileType.SmallWeight){
-      weight = 3;
+        weight = 3;
     }
     if (neighbor.Type === Node.TileType.BigWeight){
-      weight = 5;
+        weight = 5;
     }
 
     const tentativeScore = closestNode.distance + weight;
     if (tentativeScore < neighbor.distance){
-      neighbor.previousNode = closestNode;
-      neighbor.distance = tentativeScore;
+        neighbor.previousNode = closestNode;
+        neighbor.distance = tentativeScore;
 
-      if (!openSet.has(neighbor)){
-        visitedNodesInOrder.push({"node": neighbor, "isVisit": false});
-        openSet.add(neighbor);
-        openHeap.push(neighbor);
-      }
+        if (!openSet.has(neighbor)){
+            visitedNodesInOrder.push({"node": neighbor, "isVisit": false});
+            openSet.add(neighbor);
+            openHeap.push(neighbor);
+        }
     }
   }
   
@@ -84,6 +81,7 @@ export function astar(grid, startNode, finishNode) {
   export function constructPath(finishNode) {
     const nodesInShortestPathOrder = [];
     let currentNode = finishNode;
+    
     while (currentNode !== null) { 
       nodesInShortestPathOrder.unshift(currentNode);
       currentNode = currentNode.previousNode;
